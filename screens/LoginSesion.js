@@ -10,12 +10,21 @@ import {
 import { useFonts } from "expo-font";
 import Input from '../components/Input';
 import { SIZES } from '../assets/styles/theme';
+import { postLogin } from '../store/reducers/User.reducer';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { getUser } from '../store/reducers/User.reducer';
+import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+import AppLoader from '../components/AppLoader';
 
 const LoginSesion = () => {
     const navigation =useNavigation();
+    const dispatch = useDispatch();
     const [inputs, setInputs] = useState({email: '', password: ''});
     const [errors, setErrors] = useState({});
-
+    const { isLoggedIn, name, role, image, loading, errorLogin } = useSelector(
+        (state) => state.userReducer
+    );
 
     let [fontsLoaded] = useFonts({
         Poppins_400Regular,
@@ -42,21 +51,32 @@ const LoginSesion = () => {
         handleError('Por favor ingresa tu contraseña', 'password');
         isValid = false;
         }
+        if(isValid === true){
+            const data ={ 
+                email: inputs.email,
+                password: inputs.password,
+            }
+            dispatch(postLogin(data))
+        }
     };
 
     return (
         <SafeAreaView style={{flex:1,backgroundColor:"#fff"}}>
+            {loading=== true && <AppLoader></AppLoader>}
             <View style={style.header}>
-            <Icon name="arrow-back-ios" size={17} onPress={navigation.goBack} />
+            <TouchableOpacity onPress={navigation.goBack} style={{flex:1, flexDirection:"row"}}>
+            <Icon name="arrow-back-ios" size={17} />
             <Text style={{fontSize: 17, fontFamily:"Poppins_700Bold"}}>Volver</Text>
+            </TouchableOpacity>
             </View>
             <ScrollView contentContainerStyle={{paddingTop:40, paddingHorizontal:20}}>
                 <Text style={{fontSize: 40, fontFamily:"Poppins_700Bold"}}>Iniciar  Sesión</Text>
                 <View style={{marginVertical:20}}>
                     <Input label="Email" iconName="email-outline" placeholder="Ingresa tu correo electrónico" onChangeText={text => handleOnchange(text, 'email')}
-            onFocus={() => handleError(null, 'email')}  error={errors.email}/>
+            onFocus={() => handleError(null, 'email')}  error={errors.email} required/>
                     <Input label="Contraseña" iconName="lock-outline" placeholder="Ingresa tu contraseña" password onChangeText={text => handleOnchange(text, 'password')}
-            onFocus={() => handleError(null, 'password')}  error={errors.password} />
+            onFocus={() => handleError(null, 'password')}  error={errors.password} required/>
+            {errorLogin === "user or password invalid" &&  <Text style={{color:"red",fontFamily:"Poppins_400Regular"}}>Usuario o contraseña invalidos</Text>}
                     <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={validate}>
                         <Text style={style.textLeft}>
                     Login

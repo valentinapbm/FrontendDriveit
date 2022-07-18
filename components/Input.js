@@ -14,7 +14,7 @@ import {
     } from '@expo-google-fonts/poppins'
 import { useFonts } from "expo-font";
 
-const Input =({label, iconName, error, password, OnFocus=()=>{},...props})=>{
+const Input =({label, iconName, error, password, required, OnFocus=()=>{},...props})=>{
     
     const [hidePassword, setHidePassword] = React.useState(password);
     const [isFocused, setIsFocused] = React.useState(false);
@@ -31,7 +31,7 @@ const Input =({label, iconName, error, password, OnFocus=()=>{},...props})=>{
 
     return(
         <View style={{marginBottom:20}}>
-            <Text style={style.label}>{label}<Text style={{color:"red"}}> *</Text></Text>
+            <Text style={style.label}>{label}{required && <Text style={{color:"red"}}> *</Text>}</Text>
             <View style={[
             style.inputContainer,
             {

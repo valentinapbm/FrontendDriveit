@@ -1,27 +1,34 @@
 import React, {useState} from 'react';
 import {SafeAreaView, Text, View, StyleSheet, ScrollView,  TouchableOpacity,} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { 
     Poppins_400Regular,
     Poppins_600SemiBold,
     Poppins_700Bold,
+    Poppins_300Light,
     } from '@expo-google-fonts/poppins'
 import { useFonts } from "expo-font";
 import Input from '../components/Input';
 import { SIZES } from '../assets/styles/theme';
-import { RadioButton } from 'react-native-paper';
+import { postRegister } from '../store/reducers/User.reducer';
+import { useDispatch, useSelector } from 'react-redux';
+import AppLoader from '../components/AppLoader';
 
 const RegisterSesion = () => {
     const navigation =useNavigation();
+    const dispatch = useDispatch();
     const [inputs, setInputs] = useState({email: '', password: '', fullname:''});
     const [errors, setErrors] = useState({});
-    const [value, setValue] = React.useState('first');
-
+    const [value, setValue] = React.useState('client');
+    const {loading, errorRegister } = useSelector(
+        (state) => state.userReducer
+    );
     let [fontsLoaded] = useFonts({
         Poppins_400Regular,
         Poppins_700Bold,
-        Poppins_600SemiBold
+        Poppins_600SemiBold,Poppins_300Light,
     });
     if (!fontsLoaded) {
         return null
@@ -34,6 +41,7 @@ const RegisterSesion = () => {
             setErrors(prevState => ({...prevState, [input]: error}));
         };
     const validate = () => {
+        
         let isValid = true;
         if (!inputs.email) {
         handleError('Por favor ingresa tu correo', 'email');
@@ -50,39 +58,80 @@ const RegisterSesion = () => {
         handleError('Por favor ingresa tu contraseña', 'password');
         isValid = false;
         }
+        if(isValid === true){
+            const data ={ 
+                fullname: inputs.fullname,
+                email: inputs.email,
+                password: inputs.password,
+                role: value
+            }
+            dispatch(postRegister(data))
+        }
     };
+    const PROP = [
+        {
+            key: 'client',
+            text: 'Quiero alquirar un carro',
+            icon: "car"
+        },
+        {
+            key: 'host',
+            text: 'Quiero prestar mi carro',
+            icon : "car-key",
+        },
+    ];
 
     return (
         <SafeAreaView style={{flex:1,backgroundColor:"#fff"}}>
+            {loading=== true && <AppLoader></AppLoader>}
             <View style={style.header}>
-            <Icon name="arrow-back-ios" size={17} onPress={navigation.goBack} />
+            <TouchableOpacity onPress={navigation.goBack} style={{flex:1, flexDirection:"row"}}>
+            <Icon1 name="arrow-back-ios" size={17} />
             <Text style={{fontSize: 17, fontFamily:"Poppins_700Bold"}}>Volver</Text>
+            </TouchableOpacity>
             </View>
-            <ScrollView contentContainerStyle={{paddingTop:40, paddingHorizontal:20}}>
+            <ScrollView contentContainerStyle={{paddingTop:10, paddingHorizontal:20}}>
                 <Text style={{fontSize: 40, fontFamily:"Poppins_700Bold"}}>Registrate</Text>
                 <View style={{marginVertical:20}}>
-                <Input label="Nombre Completo" iconName="email-outline" placeholder="Ingresa tu correo electrónico" onChangeText={text => handleOnchange(text, 'fullname')}
-                        onFocus={() => handleError(null, 'fullname')}  error={errors.fullname}/>
+                <Input label="Nombre Completo" placeholder="Ingresa tu nombre completo" onChangeText={text => handleOnchange(text, 'fullname')}
+                        onFocus={() => handleError(null, 'fullname')}  error={errors.fullname} required/>
                 <Input label="Email" iconName="email-outline" placeholder="Ingresa tu correo electrónico" onChangeText={text => handleOnchange(text, 'email')}
-                        onFocus={() => handleError(null, 'email')}  error={errors.email}/>
+                        onFocus={() => handleError(null, 'email')}  error={errors.email} required/>
+                        {errorRegister === "email already exist" && <Text style={{color:"red",fontFamily:"Poppins_400Regular"}}>Correo ya existe</Text>}
                 <Input label="Contraseña" iconName="lock-outline" placeholder="Ingresa tu contraseña" password onChangeText={text => handleOnchange(text, 'password')}
-                    onFocus={() => handleError(null, 'password')}  error={errors.password} />
+                    onFocus={() => handleError(null, 'password')}  error={errors.password} required />
+                    <View style={style.container}>
+                    {PROP.map(res => {
+					return (
+						<View key={res.key} style={styles.container}>
+                            <TouchableOpacity
+								onPress={() => {
+									setValue(res.key);
+								}}>
+                                    <View key={res.key} style={styles.containerText}>
+							<Text style={styles.radioText}>{res.text}</Text>
+                            <Icon name={res.icon} style={{fontSize:22}} ></Icon></View></TouchableOpacity>
+							<View style={styles.containerRadio}>
+                            <TouchableOpacity
+								style={styles.radioCircle}
+								onPress={() => {
+									setValue(res.key);
+								}}>
+                                    {value === res.key && <View style={styles.selectedRb} />}
+							</TouchableOpacity>
+                            </View>
+						</View>
+					);
+				})}
+                    </View>
+                    
                     <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={validate}>
                         <Text style={style.textLeft}>
                     Registrate
                     </Text></TouchableOpacity>
                 </View>
                 <View>
-                <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
-                    <View>
-                        <Text>First</Text>
-                        <RadioButton value="first" />
-                    </View>
-                    <View>
-                        <Text>Second</Text>
-                        <RadioButton value="second" />
-                    </View>
-                    </RadioButton.Group>
+
                 </View>
             </ScrollView>
 
@@ -126,7 +175,6 @@ const style = StyleSheet.create({
             padding:15,
             borderRadius: 4,
             backgroundColor: '#072F4A',
-            marginTop:10
         },
         rigth:{
             width:"60%",
@@ -144,6 +192,67 @@ const style = StyleSheet.create({
             color: "white",
             fontFamily:"Poppins_700Bold",
             fontSize: SIZES.h4,
+        },
+        container: {
+            flex: 1,
+            flexDirection:"row",
+            alignItems: 'center',
+            justifyContent: 'center',
+            
+        }
+    });
+    const styles = StyleSheet.create({
+        container: {
+            width:"40%",
+            flexDirection:"column-reverse",
+            borderWidth: 0.5,
+            marginBottom: 15,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            margin:10,
+            borderRadius:10,
+            borderColor:"#D3D6D6"
+        },
+        containerText:{
+            flexDirection:"column-reverse",
+            alignItems: 'center',
+        },
+        containerRadio: {
+            flex:1,
+            width:"100%",
+            flexDirection:"column-reverse",
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end',
+            paddingTop:5,
+            paddingRight:5
+        },
+        radioText: {
+            fontSize: 15,
+            color: '#000',
+            textAlign:"center",
+            fontFamily:"Poppins_300Light"
+            
+        },
+        radioCircle: {
+            height: 20,
+            width: 20,
+            borderRadius: 100,
+            borderWidth: 2,
+            borderColor: '#072F4A',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        selectedRb: {
+            width: 10,
+            height: 10,
+            borderRadius: 50,
+            backgroundColor: '#072F4A',
+        },
+        result: {
+            marginTop: 20,
+            color: 'white',
+            fontWeight: '600',
+            backgroundColor: '#F3FBFE',
         },
     });
 
