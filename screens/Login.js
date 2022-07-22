@@ -8,8 +8,8 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { COLORS1, SIZES } from '../assets/styles/theme';
-import logo from "../images/Imagen4.png";
-import photo from "../images/login.png"
+import logo from "../assets/images/Imagen4.png";
+import photo from "../assets/images/login.png"
 import { 
     Poppins_400Regular,
     Poppins_600SemiBold,
@@ -32,46 +32,7 @@ const Login = ({navigation}) => {
         return null
     }
    
-
-    StatusBar.setBarStyle('light-content', true);
-    StatusBar.setBackgroundColor(COLORS.primary);
-   
-
-        const nextButton = () => {
-            return(
-                <View style={{
-                    padding: 12, 
-                }}>
-                <Text style={{
-                color: COLORS1.title,
-                fontWeight: '600',
-                fontSize: SIZES.h4,
-                fontFamily:"Poppins_700Bold",
-                }}>
-                Next
-                </Text>
-                </View>
-                )
-            }
-
-            const doneButton = () => {
-                return(
-                    <View style={{
-                        padding: 12, 
-                    }}>
-                    <TouchableOpacity
-                        onPress={() => navigation1.navigate('LoginSesion')}>
-                    <Text style={{
-                    color: COLORS1.title,
-                    fontFamily:"Poppins_700Bold",
-                    fontSize: SIZES.h4,
-                    }}>
-                    Comenzar
-                    </Text>
-                    </TouchableOpacity>
-                    </View>
-                    )
-                }
+    
 
         
     

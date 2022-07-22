@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { COLORS1, SIZES } from '../assets/styles/theme';
 import AppIntroSlider from "react-native-app-intro-slider";
-import logo from "../images/Imagen4.png"
+import logo from "../assets/images/Imagen4.png"
 import { 
     Poppins_100Thin,
     Poppins_100Thin_Italic,
@@ -42,20 +42,20 @@ const COLORS = {primary: '#fff', white: '#000'};
 const slides = [
     {
     id: '1',
-    image: require('../images/Imagen1.png'),
+    image: require('../assets/images/Imagen1.png'),
     title: 'Alquila el carro perfecto para cualquier ocasión',
     description: 'Nunca fue tan fácil alquilar un carro en una app.',
     
     },
     {
     id: '2',
-    image: require('../images/Imagen2.png'),
+    image: require('../assets/images/Imagen2.png'),
     title: 'Bajas tarifas y servicio de calidad',
     description: 'Encuentra las tarifas más bajas y vive una experiencia única.',
     },
     {
     id: '3',
-    image: require('../images/Imagen3.png'),
+    image: require('../assets/images/Imagen3.png'),
     title: 'Encuentra tu carro más cercano',
     description: 'Filtra tu búsqueda por ciudad para que sea más fácil encontrar tu carro.',
     },

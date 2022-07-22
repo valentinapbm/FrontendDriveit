@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "driveit",
+    "jsEngine": "hermes",
     "slug": "driveit",
     "version": "1.0.0",
     "orientation": "portrait",

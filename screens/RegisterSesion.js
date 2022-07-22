@@ -19,7 +19,7 @@ import AppLoader from '../components/AppLoader';
 const RegisterSesion = () => {
     const navigation =useNavigation();
     const dispatch = useDispatch();
-    const [inputs, setInputs] = useState({email: '', password: '', fullname:''});
+    const [inputs, setInputs] = useState({email: '', password: '', name:'', lastname:''});
     const [errors, setErrors] = useState({});
     const [value, setValue] = React.useState('client');
     const {loading, errorRegister } = useSelector(
@@ -50,8 +50,12 @@ const RegisterSesion = () => {
             handleError('Correo no válido', 'email');
             isValid = false;
         }
-        if (!inputs.fullname) {
-            handleError('Por favor ingresa tu nombre', 'fullname');
+        if (!inputs.name) {
+            handleError('Por favor ingresa tu nombre', 'name');
+            isValid = false;
+        }
+        if (!inputs.lastname) {
+            handleError('Por favor ingresa tu apellido', 'lastname');
             isValid = false;
         }
         if (!inputs.password) {
@@ -60,7 +64,8 @@ const RegisterSesion = () => {
         }
         if(isValid === true){
             const data ={ 
-                fullname: inputs.fullname,
+                name: inputs.name,
+                lastname:inputs.lastname,
                 email: inputs.email,
                 password: inputs.password,
                 role: value
@@ -90,11 +95,13 @@ const RegisterSesion = () => {
             <Text style={{fontSize: 17, fontFamily:"Poppins_700Bold"}}>Volver</Text>
             </TouchableOpacity>
             </View>
-            <ScrollView contentContainerStyle={{paddingTop:10, paddingHorizontal:20}}>
-                <Text style={{fontSize: 40, fontFamily:"Poppins_700Bold"}}>Registrate</Text>
-                <View style={{marginVertical:20}}>
-                <Input label="Nombre Completo" placeholder="Ingresa tu nombre completo" onChangeText={text => handleOnchange(text, 'fullname')}
-                        onFocus={() => handleError(null, 'fullname')}  error={errors.fullname} required/>
+            <ScrollView contentContainerStyle={{paddingTop:0, paddingHorizontal:20}}>
+                <Text style={{fontSize: 35, fontFamily:"Poppins_700Bold"}}>Registrate</Text>
+                <View style={{marginVertical:5}}>
+                <Input label="Nombre" placeholder="Ingresa tu nombre" onChangeText={text => handleOnchange(text, 'name')}
+                        onFocus={() => handleError(null, 'name')}  error={errors.name} required/>
+                <Input label="Apellido" placeholder="Ingresa tu apellido" onChangeText={text => handleOnchange(text, 'lastname')}
+                        onFocus={() => handleError(null, 'lastname')}  error={errors.lastname} required/>
                 <Input label="Email" iconName="email-outline" placeholder="Ingresa tu correo electrónico" onChangeText={text => handleOnchange(text, 'email')}
                         onFocus={() => handleError(null, 'email')}  error={errors.email} required/>
                         {errorRegister === "email already exist" && <Text style={{color:"red",fontFamily:"Poppins_400Regular"}}>Correo ya existe</Text>}

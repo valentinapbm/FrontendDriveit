@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon2 from 'react-native-vector-icons/AntDesign'
 import {
     StyleSheet,
     View,
@@ -14,7 +14,7 @@ import {
     } from '@expo-google-fonts/poppins'
 import { useFonts } from "expo-font";
 
-const Input =({label, iconName, error, password,number, required, OnFocus=()=>{},...props})=>{
+const InputSearch =({label, iconName, error, password,number, required, OnFocus=()=>{},...props})=>{
     
     const [hidePassword, setHidePassword] = React.useState(password);
     const [isFocused, setIsFocused] = React.useState(false);
@@ -30,8 +30,7 @@ const Input =({label, iconName, error, password,number, required, OnFocus=()=>{}
     }
 
     return(
-        <View style={{marginBottom:15}}>
-            <Text style={style.label}>{label}{required && <Text style={{color:"red"}}> *</Text>}</Text>
+        <View>
             <View style={[
             style.inputContainer,
             {
@@ -43,7 +42,7 @@ const Input =({label, iconName, error, password,number, required, OnFocus=()=>{}
                 alignItems: 'center',
             },
             ]}>
-                <Icon name={iconName} style={{fontSize:22, marginRight:10}}  />
+                <Icon2 name="search1" style={{fontSize:22, marginRight:10, marginLeft:20}}  />
                 <TextInput autoCorrect={false} 
                     onFocus={()=>{
                         OnFocus();
@@ -54,7 +53,7 @@ const Input =({label, iconName, error, password,number, required, OnFocus=()=>{}
                     keyboardType={number ? "numeric" :"default" }
                     style={{flex:1, fontFamily:"Poppins_300Light"}} {...props}/>
                     {password && (
-            <Icon
+            <Icon2
                 onPress={() => setHidePassword(!hidePassword)}
                 name={hidePassword ? 'eye-outline' : 'eye-off-outline'}
                 style={{color: "#072F4A", fontSize: 22}}
@@ -78,13 +77,13 @@ const style = StyleSheet.create({
         },
         inputContainer: {
         height: 55,
-        backgroundColor: "#F3F4FB",
+        backgroundColor: "white",
         flexDirection: 'row',
-        paddingHorizontal: 15,
         borderWidth: 0.5,
         alignItems:"center",
-        borderRadius:10
+        borderRadius:50,
+        elevation:2
         },
     });
 
-export default Input;
+export default InputSearch;

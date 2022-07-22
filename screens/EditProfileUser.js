@@ -24,11 +24,12 @@ import { isImmutableDefault } from '@reduxjs/toolkit';
 const EditProfileUser = () => {
     const navigation =useNavigation();
     const dispatch = useDispatch();    
-    const {loading, errorRegister, fullname, image, gender, birthday } = useSelector(
+    const {loading, errorRegister, name,lastname, image, gender, birthday } = useSelector(
         (state) => state.userReducer
     );
 
-    const [inputs, setInputs] = useState(fullname);
+    const [inputs, setInputs] = useState(name);
+    const [lastName, setLastname]= useState(lastname)
     const [birthday1, setBirthday]= useState(birthday === null || birthday === undefined ? new Date() : new Date(birthday));
 
     const [errors, setErrors] = useState({});
@@ -53,7 +54,8 @@ const EditProfileUser = () => {
         };
     const validate = () => {
         const data = {
-            fullname: inputs,
+            name: inputs,
+            lastname:lastName,
             birthday:birthday1,
             gender: value
         
@@ -153,8 +155,10 @@ const EditProfileUser = () => {
                             <Icon name='trash-can-outline'size={20} color="white"/>
                         </TouchableOpacity>
                     </View>}
-                <Input label="Nombre Completo" placeholder="Ingresa tu nombre completo" onChangeText={text => setInputs(text)}
-                        onFocus={() => handleError(null, 'fullname')}  error={errors.fullname} value={inputs}/>
+                <Input label="Nombre" placeholder="Ingresa tu nombre completo" onChangeText={text => setInputs(text)}
+                        onFocus={() => handleError(null, 'name')}  error={errors.fullname} value={inputs}/>
+                    <Input label="Apellido" placeholder="Ingresa tu nombre completo" onChangeText={text => setLastname(text)}
+                        onFocus={() => handleError(null, 'lastname')}  error={errors.fullname} value={lastName}/>
                         {errorRegister === "email already exist" && <Text style={{color:"red",fontFamily:"Poppins_400Regular"}}>Correo ya existe</Text>}
                     <Text style={style.label}>Fecha de nacimiento</Text>
                     <View style={{flexDirection:"row", justifyContent:"space-between"}}>

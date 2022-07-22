@@ -3,9 +3,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as RootNavigation from "../../components/RootNavigation"
 import Toast from 'react-native-root-toast';
 
+
 export const USER_ID = 'USER_ID';
 export const USER_ROLE = 'USER_ROLE';
 export const USER_NAME = 'USER_NAME';
+export const USER_LASTNAME = 'USER_LASTNAME';
 export const USER_EMAIL = 'USER_EMAIL';
 export const USER_PASSWORD = 'USER_PASSWORD';
 export const USER_IMAGE = 'USER_IMAGE';
@@ -49,7 +51,8 @@ export const getUser = (route) => {
             });
             const user = data.data;
             dispatch({ type: USER_ROLE, payload: user.role });
-            dispatch({ type: USER_NAME, payload: user.fullname });
+            dispatch({ type: USER_NAME, payload: user.name });
+            dispatch({ type: USER_LASTNAME, payload: user.lastname });
             dispatch({ type: USER_EMAIL, payload: user.email });
             dispatch({ type: USER_PASSWORD, payload: user.password });
             dispatch({ type: USER_IMAGE, payload: user.image });
@@ -57,6 +60,7 @@ export const getUser = (route) => {
             dispatch({ type: USER_REVIEWS, payload: user.reviews });
             dispatch({ type: USER_BIRTHDAY, payload: user.birthday });
             dispatch({ type: USER_GENDER, payload: user.gender });
+            dispatch({ type: USER_CARS, payload: user.cars });
 
             dispatch({ type: USER_LOGIN_SUCCESS });
         } catch (err) {
@@ -122,6 +126,39 @@ export const getUser = (route) => {
         }
         };
     };
+
+    export const deleteAccount = () => {
+        return async (dispatch) => {
+            dispatch({ type: USER_REGISTER_REQUEST })
+            try{
+                const token = await AsyncStorage.getItem('token')
+                if(token !== null){
+                try {
+            const res = await axios.delete(
+            'https://driveit-app.herokuapp.com/users/delete',
+            {
+            headers: {
+            
+            Authorization: `Bearer ${token}`,
+            }});
+
+
+
+            RootNavigation.navigate('Login');
+            dispatch({ type: USER_REGISTER_SUCCESS, payload: res });
+            dispatch(signOutSuccess());
+            dispatch(getCars())
+        } catch (error) {
+            dispatch({
+                type: USER_REGISTER_ERROR,
+                payload: error,
+            });
+        }
+        };
+    }catch(err){
+        console.log(err)
+    };
+    }}
     
     //action creator: Register
     export const updateUser = (value) => {
@@ -243,7 +280,8 @@ export const getUser = (route) => {
         errorUser:null,
         errorRegister:null,
         role: null,
-        fullname:null,
+        name:null,
+        lastname:null,
         email: null,
         password: null,
         image: null,
@@ -270,6 +308,7 @@ export const getUser = (route) => {
             isLoggedIn: true,
             loading: false,
             error: null,
+            
             isalreadyatoken: false,
         };
         case USER_LOGIN_REQUEST:
@@ -315,8 +354,13 @@ export const getUser = (route) => {
         case USER_NAME:
         return {
             ...state,
-            fullname: action.payload,
+            name: action.payload,
         };
+        case USER_LASTNAME:
+            return {
+                ...state,
+                lastname: action.payload,
+            };
         case USER_EMAIL:
         return {
             ...state,

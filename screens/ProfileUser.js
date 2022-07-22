@@ -22,9 +22,10 @@ const ProfileUser = () => {
   
     const navigation1 =useNavigation();
     const dispatch = useDispatch()
-    const { isLoggedIn, fullname, role, image, email } = useSelector(
+    const { isLoggedIn, name, lastname, role, image, email } = useSelector(
         (state) => state.userReducer
     );
+ 
 
 
         let [fontsLoaded] = useFonts({
@@ -40,7 +41,7 @@ const ProfileUser = () => {
       };
     return (
         <SafeAreaView
-        style={{flex: 1}}>
+        style={{flex: 1, backgroundColor:"#f3f5fb"}}>
         <ScrollView contentContainerStyle={{paddingTop:60, paddingHorizontal:20, paddingBottom:10}}>
         <Text style={{fontSize: 35
             , fontFamily:"Poppins_700Bold"}}>Perfil</Text>
@@ -48,7 +49,7 @@ const ProfileUser = () => {
            
                 <Image source={image  ? {uri:image} : UsernoPhoto} style={style.logo}/>
             <Text style={{fontSize: 25
-            , fontFamily:"Poppins_600SemiBold", color:"#696969", paddingTop:1}}>{fullname}</Text>
+            , fontFamily:"Poppins_600SemiBold", color:"#696969", paddingTop:1}}>{name} {lastname}</Text>
             <Text style={{fontSize: 15
             , fontFamily:"Poppins_300Light", color:"#696969"}}>{email}</Text>
         </View>
@@ -100,7 +101,7 @@ const ProfileUser = () => {
             </View>
                 <Icon1 name="arrow-forward-ios" size={17} />
         </TouchableOpacity>
-        <TouchableOpacity style={{flex:1, flexDirection:"row", padding:5, justifyContent:"space-between", alignItems:"center",paddingHorizontal:15}}>
+        <TouchableOpacity style={{flex:1, flexDirection:"row", padding:5, justifyContent:"space-between", alignItems:"center",paddingHorizontal:15}} onPress={() => navigation1.navigate('DeleteAccount')}>
             <View style={{flexDirection:"row"}}>
                 <View style={style.styleicon2}>
                     <Icon name='trash-can-outline'size={28} color="red"/> 

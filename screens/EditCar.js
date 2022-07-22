@@ -20,38 +20,44 @@ import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import { createCar } from '../store/reducers/Car.reducer';
 import AppLoader from "../components/AppLoader"
 import ModalPicker  from "../components/ModalPicker"
+import Checkbox from 'expo-checkbox';
+import { getUser } from '../store/reducers/User.reducer';
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CreateCar = ({navigation, route}) => {
+const EditCar = ({navigation, route}) => {
     const {loading} = useSelector(
         (state) => state.carReducer
     );
+        const {car}= route.params
 
 
     const Options = ["Audi", "BMW", "Chevrolet", "Citroen", "Daihatsu", "Dodge", "Fiat", "Ford", "Honda", "Hyundai", "Jeep", "Kia","Mazda", "Mercedes-Benz", "MINI", "Mitsubishi Motors", "Nissan", "Peugeot", "Porsche", "Renault", "Seat", "Skoda", "SSangYong", "Subaru", "Suzuki", "Tesla", "Toyota", "Volkswagen", "Volvo"]
     const Colors = ["Beige", "Negro", "Azul", "Marrón", "Vinotinto", "Crema", "Dorado", "Verde", "Gris", "Anaranjado", "Morado", "Rojo","Plateado", "Blanco", "Amarillo"]
     const navigation1 =useNavigation();
     const dispatch = useDispatch()
-    const [brand, setBrand]= useState('Selecciona una opción')
-    const [model, setModel]=useState("")
-    const [year, setYear]=useState()
-    const [color, setColor]= useState('Selecciona una opción')
+    const [brand, setBrand]= useState(car.brand)
+    const [model, setModel]=useState(car.model)
+    const [year, setYear]=useState(car.year.toString())
+    const [color, setColor]= useState(car.color)
     const [modalBrand, setModalBrand] = useState(false)
     const [modalColor, setModalColor] = useState(false)
-    const [value, setValue] = useState('gasolina');
-    const [transmision, setTransmision] = useState('mecanic');
-    const [countDoors, setCountDoors]=useState(0)
-    const [countSeats, setCountSeats] = useState(0)
-    const [price, setPrice]=useState(0)
+    const [value, setValue] = useState(car.fuel);
+    const [transmision, setTransmision] = useState(car.transmision);
+    const [countDoors, setCountDoors]=useState(car.countDoors)
+    const [countSeats, setCountSeats] = useState(car.countSeats)
+    const [price, setPrice]=useState(car.price)
     const [photos, setPhotos]=useState([])
     const [errors, setErrors] = useState({});
+    const [photosUploaded, setPhotosUploaded]= useState(car.images)
 
 
 	const [ region, setRegion ] = React.useState({
-		latitude: 3.43722,
-		longitude: -76.5225,
+		latitude: car.lat,
+		longitude: car.lng,
         latitudeDelta: 0.0922,
 		longitudeDelta: 0.0421,
-        city:null
+        city:car.city
 	})
     const changeModalVisibility =(bool)=>{
         setModalBrand(bool)
@@ -143,41 +149,14 @@ const CreateCar = ({navigation, route}) => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const validate = () => {
-        
-        let isValid = true;
-        if (brand === "Selecciona una opción") {
-        handleError('Por favor ingresa este campo', 'brand');
-        isValid = false;
-        }
-
-        if (!year) {
-            handleError('Por favor ingresa este campo', 'year');
-            isValid = false;
-        }
-        if (price === 0) {
-        handleError('Por favor ingresa este campo', 'price');
-        isValid = false;
-        }
-        if (photos.length === 0) {
-            handleError('Por favor ingresa este campo', 'photos');
-            isValid = false;
-        }
-
-        if(region.latitude === (3.43722) && region.longitude === (-76.5225)){
-            handleError('Por favor ingresa este campo', 'region');
-            isValid = false;
-        }
-
-
-
-        if(isValid === true){
+    async function validate () {
             const data = new FormData();
+            const phots = JSON.stringify(photosUploaded)
             data.append('brand', brand)
             if(model){
                 data.append('model', model)
             }
-            data.append('year', year)
+            data.append('year', Number(year))
             data.append('fuel', value)
             if(color !== "Selecciona una opción"){
             data.append('color', color)}
@@ -190,16 +169,39 @@ const CreateCar = ({navigation, route}) => {
             data.append('lat', region.latitude);
             data.append('lng', region.longitude)
             data.append('city', region.city)
+            data.append('images' , phots)
             if(photos){
                 for (let i = 0; i < photos.length; i++) {
                     //nombre de la propiedad, archivo y nombre del archivo
                     data.append(`file_${i}`, photos[i]);
                 }
             }
-            dispatch(createCar(data))
+            try{
+                const token = await AsyncStorage.getItem('token')
+                if(token !== null){
+                try {
+                const data1 = await axios.put(
+                    `https://driveit-app.herokuapp.com/cars/update/${car._id}`, 
+                    data,
+                    {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`,
+                        
+                },
+                });
 
-    };
-}
+                    console.log("respuesta",data1)
+                    
+            } catch (err) {
+                console.log(err.response)
+            }
+            };
+        
+        } catch(err){
+            console.log(err.response)
+        };
+    }
     function renderImage (item, i) {
         return (
         <Image
@@ -212,6 +214,12 @@ const CreateCar = ({navigation, route}) => {
         )
     
     }
+    function deleteImage (item2, i){
+        const newPhotos = photosUploaded.filter(item=>item!==item2)
+
+        setPhotosUploaded(newPhotos)
+    }
+
     let [fontsLoaded] = useFonts({
         Poppins_400Regular,
         Poppins_700Bold,
@@ -223,9 +231,12 @@ const CreateCar = ({navigation, route}) => {
     }
     const list = (
         <>
-            
+            <TouchableOpacity onPress={navigation.goBack} style={{flex:1, flexDirection:"row"}}>
+            <Icon1 name="arrow-back-ios" size={17} />
+            <Text style={{fontSize: 17, fontFamily:"Poppins_700Bold"}}>Volver</Text>
+            </TouchableOpacity>
         <Text style={{fontSize: 35
-            , fontFamily:"Poppins_700Bold"}}>Publica un nuevo vehículo</Text>
+            , fontFamily:"Poppins_700Bold"}}>Edita tu vehículo</Text>
         <View style={style.containertop}>
             <Text style={{fontSize: 20
             , fontFamily:"Poppins_600SemiBold", color:"#696969", paddingTop:1}}>Agrega algunos detalles</Text>
@@ -363,7 +374,7 @@ const CreateCar = ({navigation, route}) => {
         <View style={style.containertop}>
             <Text style={{fontSize: 20
             , fontFamily:"Poppins_600SemiBold", color:"#696969", paddingTop:1}}>Sube tus imagenes <Text style={{color:"red"}}>*</Text></Text>
-           <TouchableOpacity style={errors.photos ? style.imagesError: style.images} onPress={()=> navigation.navigate("ImageBrowser")}>
+           <TouchableOpacity style={errors.photos ? style.imagesError: style.images} onPress={()=> navigation.navigate("ImageBrowser2", {car: car, cPhotos: null})}>
                 <Text style={{fontSize: 14
             , fontFamily:"Poppins_300Light", color:"#A9A9A9", paddingLeft:10, textAlign:"center"}}><Icon name="cloud-upload-outline" size={20}/> Sube tus archivos</Text>
                 
@@ -374,9 +385,33 @@ const CreateCar = ({navigation, route}) => {
             </Text>
             )}
         <View style={{flexDirection:"row", flexWrap:"wrap", justifyContent:"space-between", padding:10}}>
-            {photos && photos.map((item, i) => renderImage(item, i))}
-        </View>
+           {photos && <View style={{flexDirection:"row", flexWrap:"wrap", justifyContent:"space-between", padding:10}}>
+                {photos.map((item, i) => renderImage(item, i))}
+            </View>}
+            </View>
             
+            
+        </View>
+        <View style={style.containertop}>
+        <Text style={{fontSize: 20
+            , fontFamily:"Poppins_600SemiBold", color:"#696969", paddingTop:1}}>Edita tus anteriores fotos</Text>
+         <View style={{flexDirection:"row", flexWrap:"wrap", justifyContent:"space-between", padding:10}}>
+        {photosUploaded.map((item, index)=>(
+                <View key={index}  style={{justifyContent:"center", alignItems:"center"}} >
+                
+                    <Image
+                        style={{ height: 100, width: 100, borderColor: "#A9A9A9",
+                        }}
+                        source={{ uri: item }}
+                        key={index}
+                        
+                    />
+                    <TouchableOpacity style={{width:20 , justifyContent:"center", alignItems:"center"}} onPress={()=>deleteImage(item, index)}>
+                    <Icon name='trash-can-outline' size={20} color="red"/>
+                    </TouchableOpacity>
+                </View>
+            ))}
+            </View>
         </View>
         <View style={style.containertop}>
         <Text style={{fontSize: 20
@@ -390,10 +425,10 @@ const CreateCar = ({navigation, route}) => {
 				}}
                 renderRow={results => (
                     <>
-                     <Icon1 name="location-on"/>
-                     <Text style={{fontFamily:"Poppins_300Light"}}>{results.description}</Text>
-                   </>
-                   )}
+                        <Icon1 name="location-on"/>
+                        <Text style={{fontFamily:"Poppins_300Light"}}>{results.description}</Text>
+                    </>
+                    )}
 				onPress={(data, details = null) => {
                     const city=details.address_components.filter((item)=>item.types.includes("locality"))
                     const city2=city[0].long_name
@@ -422,8 +457,8 @@ const CreateCar = ({navigation, route}) => {
 			<MapView
 				style={{width:"100%", height:400, marginBottom:20,}}
 				initialRegion={{
-					latitude: 37.78825,
-					longitude: -122.4324,
+					latitude: region.latitude,
+					longitude: region.longitude,
 					latitudeDelta: 0.0922,
 					longitudeDelta: 0.0421
 				}}
@@ -448,7 +483,7 @@ const CreateCar = ({navigation, route}) => {
 
          <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={validate}>
                         <Text style={style.textLeft}>
-                    Crear anuncio
+                    Guardar cambios
                     </Text></TouchableOpacity>
         
         </>
@@ -611,4 +646,4 @@ const style = StyleSheet.create({
             },
 })
 
-export default CreateCar;
+export default EditCar;
