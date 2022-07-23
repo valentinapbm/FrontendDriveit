@@ -149,18 +149,27 @@ const PaymentScreen = ({navigation, route}) => {
       
   async function validate () {
     
-
+    const data ={
+      carId: carId,
+      startDate: dates.startDate,
+      endDate: dates.endDate,
+      pickupHour: Object.values(hours),
+      leftHour: Object.values(hoursOut),
+      priceTotal: totalPrice,
+      payment: "cash",
+      statusBooking:"Active"
+    }
+    console.log(data)
 
     try{
         const token = await AsyncStorage.getItem('token')
         if(token !== null){
         try {
-        const data1 = await axios.put(
-            `https://driveit-app.herokuapp.com/cars/update/${car._id}`, 
+        const data1 = await axios.post(
+            `https://driveit-app.herokuapp.com/bookings/create/`, 
             data,
             {
             headers: {
-                'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${token}`,
                 
         },
@@ -307,7 +316,7 @@ function currencyFormat(num) {
                             flexDirection:"row"
                             
                         },
-                        ]}  >
+                        ]} onPress={validate} >
                             <Text style={{color: "white",
             fontFamily:"Poppins_700Bold",
             fontSize: 15,}}>Pago Total </Text> 
