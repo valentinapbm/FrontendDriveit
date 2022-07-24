@@ -22,9 +22,9 @@ For making the requests is necessary a tool like postman.
 ```
 git clone https://github.com/valentinapbm/FrontendDriveit.git
 ```
-→Then use the next comand to install all the external dependencies
+→Luego use el siguiente comando para instalar todas las dependencias externas
 ```
-Luego use el siguiente comando para instalar todas las dependencias externas
+npm install
 ```
 ## Run the App ⚙️
 → Use el siguiente comando para ejecutar la aplicación
