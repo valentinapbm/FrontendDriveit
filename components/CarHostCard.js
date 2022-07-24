@@ -50,10 +50,16 @@ const CarHostCard = ({car}) => {
                         <Text style={styles.textLeft}>
                     Editar
                     </Text></TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7} style={styles.left} >
+                    {car.bookings.length === 0 &&
+                    <TouchableOpacity activeOpacity={0.7} style={styles.left} onPress={()=>{navigation.navigate("DeleteCar", {car: car, cPhotos: null})}}>
                         <Text style={styles.textLeft}>
                     Eliminar
-                    </Text></TouchableOpacity>
+                    </Text></TouchableOpacity>}
+                    {car.bookings.length > 0 &&
+                    <TouchableOpacity activeOpacity={0.7} style={styles.left2} >
+                        <Text style={styles.textLeft}>
+                    Eliminar
+                    </Text></TouchableOpacity>}
             </View>
         </View>
     );
@@ -62,7 +68,8 @@ const styles = StyleSheet.create({
     container:{flex:1,
     backgroundColor:"white",
     borderRadius:15,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    marginVertical:10
     },
     image:{
         width:SIZES.width,
@@ -95,9 +102,19 @@ const styles = StyleSheet.create({
         borderWidth:2,
         borderColor:"#034f84"
     },
+    left2:{
+        width:"40%",
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding:10,
+        borderRadius: 15,
+        backgroundColor: '#F5F5F5',
+        borderWidth:2,
+        borderColor:"grey"
+    },
     textLeft:
     {
-        color: "#034f84",
+        color: "grey",
         fontFamily:"Poppins_700Bold",
         fontSize: SIZES.h4,
     },

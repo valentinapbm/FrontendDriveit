@@ -9,21 +9,18 @@ import {
     } from '@expo-google-fonts/poppins'
 import { useFonts } from "expo-font";
 import { useSelector} from 'react-redux';
-import AppLoader from '../components/AppLoader';
-import { SIZES } from '../assets/styles/theme';
-import UsernoPhoto from "../assets/Userphoto.png"
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import credicar from "../assets/images/credit.png"
 import cash from "../assets/images/cash.png"
 import { useDispatch } from 'react-redux';
-import { signOutSuccess } from '../store/reducers/User.reducer';
-const BookingsCars = ({navigation, route}) => {
+
+
+const UserBooking = ({navigation, route}) => {
     const navigation1 =useNavigation();
     const dispatch = useDispatch()
     const { cars, bookings } = useSelector(
         (state) => state.userReducer
     );
+        console.log(bookings)
     let [fontsLoaded] = useFonts({
         Poppins_400Regular,
         Poppins_700Bold,
@@ -34,20 +31,27 @@ const BookingsCars = ({navigation, route}) => {
     }
     function currencyFormat(num) {
         return '$' + num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+    }
+    
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
       }
+    
     return (
         <SafeAreaView
         style={{flex: 1, backgroundColor:"#f3f5fb"}}>
-        <ScrollView contentContainerStyle={{paddingTop:20, paddingHorizontal:20, paddingBottom:10}}>
+        <ScrollView contentContainerStyle={{paddingTop:60, paddingHorizontal:20, paddingBottom:100}}>
         <Text style={{fontSize: 35
             , fontFamily:"Poppins_700Bold"}}>Tus Reservas</Text>
 
-        {cars.map((item, index)=>{
-            return(
-                <View key={index}>
-
-                <Text style={{fontSize: 20, fontFamily:"Poppins_700Bold"}}>Para: {item.brand} {item.model}</Text>
-                {item.bookings.map((booking, index2)=>{
+                {bookings.length === 0 &&  <View style={{padding:10, height:250, alignItems:"center", justifyContent:"center", backgroundColor:"white", borderRadius:15, paddingTop:10}}>
+                        <Text style={{fontSize: 17, fontFamily:"Poppins_300Light", color:"#072F4A", textAlign:"center"}}>No tienes ninguna reserva en el momento</Text>
+                        
+                        
+                    </View>}
+                {bookings.map((booking, index2)=>{
                     return(
                         <View key={index2} style={style.inputContainer}>
                         <View style={booking.statusBooking === "Active" ? style.statusContainer : style.statusContainerInactive}>
@@ -70,22 +74,10 @@ const BookingsCars = ({navigation, route}) => {
                                 , fontFamily:"Poppins_300Light", color:"grey", paddingLeft:10}}>Efectivo</Text></>}</Text></View>
                             <View style={{flexDirection:"row", paddingHorizontal:15, paddingTop:5}}><Text style={{fontSize: 12, fontFamily:"Poppins_700Bold"}}>Total Pagado: </Text><Text style={{fontSize: 12, fontFamily:"Poppins_300Light"}}>{currencyFormat(booking.priceTotal)} COP</Text></View>
                         </View>
-                        <TouchableOpacity style={{padding:10, width:"100%", alignSelf:"center",      backgroundColor: "#add8e6",}} onPress={()=> {navigation.navigate("InfoUser", {userName: booking.userId.name, userlastName: booking.userId.lastname, userEmail: booking.userId.email, userImage: booking.userId.image,})}}>
-                            <Text style={{fontSize: 12, fontFamily:"Poppins_700Bold", textAlign:"center"}}>Información del contacto</Text>
-                        </TouchableOpacity>
                         </View>
-                        
                         )
-                })}
-                {item.bookings.length === 0 && 
-                <View style={{padding:10, height:250, alignItems:"center", justifyContent:"center", backgroundColor:"white", borderRadius:15, paddingTop:10}}>
-                        <Text style={{fontSize: 17, fontFamily:"Poppins_300Light", color:"#072F4A", textAlign:"center"}}>No tienes ninguna reserva en el momento</Text>
-                        
-                        
-                    </View>}
-                </View>
-            )
-        })}
+                })}            
+
         
     </ScrollView>
     </SafeAreaView>
@@ -112,4 +104,4 @@ const style = StyleSheet.create({
         
     });
 
-export default BookingsCars;
+export default UserBooking;

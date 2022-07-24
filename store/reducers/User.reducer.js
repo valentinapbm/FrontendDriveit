@@ -41,6 +41,10 @@ export const getUser = (route) => {
             if(token !== null){
                 if(route==="startagain"){
                 dispatch({ type: USER_GETUSER_TOKEN });}
+                if(route === "login"){
+                    dispatch({ type: USER_LOGIN_REQUEST })
+                }
+   
             try {
             const data = await axios({
             method: 'GET',
@@ -63,6 +67,10 @@ export const getUser = (route) => {
             dispatch({ type: USER_CARS, payload: user.cars });
 
             dispatch({ type: USER_LOGIN_SUCCESS });
+            
+            if(route === "login"){
+            RootNavigation.navigate('Inicio')}
+            
         } catch (err) {
             dispatch({ type: USER_ERROR, payload: err });
             
@@ -83,15 +91,41 @@ export const getUser = (route) => {
             loginState
         );
         await AsyncStorage.setItem('token', res.data.data);
-        if(res.status ===201){
-            RootNavigation.navigate('Inicio');
-        }
         dispatch({ type: USER_LOGIN_SUCCESS });
-        dispatch(getUser());
+        dispatch(getUser("login"));
         } catch (error) {
-        if(error.response.data.message === "user or password invalid"){
-        dispatch({ type: USER_LOGIN_ERROR, payload: error.response.data.message });
-            }
+            let toast = Toast.show('Huboun error', {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow: false,
+                animation: true,
+                hideOnPress: true,
+                backgroundColor:"#C1C0C9",
+                textColor:"#000",
+                opacity:0.8,
+                delay: 0,
+                onShow: () => {
+                    // calls on toast\`s appear animation start
+                },
+                onShown: () => {
+                    // calls on toast\`s appear animation end.
+                },
+                onHide: () => {
+                    // calls on toast\`s hide animation start.
+                },
+                onHidden: () => {
+                    // calls on toast\`s hide animation end.
+                }
+            });
+      
+            // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+            setTimeout(function () {
+                Toast.hide(toast);
+            }, 2000);
+        if(error.response.data.message === "user or password invalid" || error.response.data.message === "Password updated" || error.response.data.message === "user / password invalid"){
+        dispatch({ type: USER_LOGIN_ERROR, payload: "user or password invalid" });
+            }else{
+            dispatch({ type: USER_LOGIN_ERROR});}
         }
     };
 };
@@ -107,13 +141,8 @@ export const getUser = (route) => {
             );
             await AsyncStorage.setItem('token', res.data.data.token);
             
-            if(res.status ===201){
-                
-                RootNavigation.navigate('Inicio');
-                
-            }
             dispatch({ type: USER_REGISTER_SUCCESS, payload: res });
-            dispatch(getUser());
+            dispatch(getUser("login"));
         } catch (error) {
                 if (
                 error.response.data.data.errors.email.message === 'email already exist'
@@ -153,6 +182,34 @@ export const getUser = (route) => {
                 type: USER_REGISTER_ERROR,
                 payload: error,
             });
+            let toast = Toast.show('Huboun error', {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow: false,
+                animation: true,
+                hideOnPress: true,
+                backgroundColor:"#C1C0C9",
+                textColor:"#000",
+                opacity:0.8,
+                delay: 0,
+                onShow: () => {
+                    // calls on toast\`s appear animation start
+                },
+                onShown: () => {
+                    // calls on toast\`s appear animation end.
+                },
+                onHide: () => {
+                    // calls on toast\`s hide animation start.
+                },
+                onHidden: () => {
+                    // calls on toast\`s hide animation end.
+                }
+            });
+      
+            // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+            setTimeout(function () {
+                Toast.hide(toast);
+            }, 2000);
         }
         };
     }catch(err){
@@ -222,7 +279,7 @@ export const getUser = (route) => {
             };
         
         } catch(err){
-            console.log(error.response,message)
+            console.log(err)
         };
     }
     }
@@ -264,9 +321,37 @@ export const getUser = (route) => {
             dispatch({ type: USER_REGISTER_REQUEST })
             try{
                 const token = await AsyncStorage.removeItem('token')
+                RootNavigation.navigate('Cuenta');
                 dispatch({ type: USER_LOGOUT_SUCCESS });
             }catch(err){
-                console.log(err)
+                let toast = Toast.show('Hubo un error', {
+                    duration: Toast.durations.LONG,
+                    position: Toast.positions.BOTTOM,
+                    shadow: false,
+                    animation: true,
+                    hideOnPress: true,
+                    backgroundColor:"#C1C0C9",
+                    textColor:"#000",
+                    opacity:0.8,
+                    delay: 0,
+                    onShow: () => {
+                        // calls on toast\`s appear animation start
+                    },
+                    onShown: () => {
+                        // calls on toast\`s appear animation end.
+                    },
+                    onHide: () => {
+                        // calls on toast\`s hide animation start.
+                    },
+                    onHidden: () => {
+                        // calls on toast\`s hide animation end.
+                    }
+                });
+          
+                // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+                setTimeout(function () {
+                    Toast.hide(toast);
+                }, 2000);
             }
         };
     };

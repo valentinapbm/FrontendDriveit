@@ -38,7 +38,7 @@ const CarsHost = () => {
     return (
         <SafeAreaView
         style={{flex: 1, backgroundColor:"#f3f5fb"}}>
-        <ScrollView contentContainerStyle={{paddingTop:20, paddingHorizontal:20, paddingBottom:10}}>
+        <ScrollView contentContainerStyle={{paddingTop:20, paddingHorizontal:20, paddingBottom:100}}>
         <Text style={{fontSize: 35
             , fontFamily:"Poppins_700Bold"}}>Tus vehículos</Text>
     {cars.length > 0 && cars.map((item, index)=>(

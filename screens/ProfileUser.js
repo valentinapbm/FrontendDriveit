@@ -69,7 +69,7 @@ const ProfileUser = () => {
             </View>
                 <Icon1 name="arrow-forward-ios" size={17} />
         </TouchableOpacity>
-        <TouchableOpacity style={{flex:1, flexDirection:"row", padding:5, justifyContent:"space-between", alignItems:"center", marginBottom:5, paddingHorizontal:15}}>
+        <TouchableOpacity  onPress={() => navigation1.navigate('ChangePassword')} style={{flex:1, flexDirection:"row", padding:5, justifyContent:"space-between", alignItems:"center", marginBottom:5, paddingHorizontal:15}} >
             <View style={{flexDirection:"row"}}>
                 <View style={style.styleicon}>
                     <Icon1 name='settings'size={28} color="white"/> 

@@ -17,13 +17,13 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete"
 import MapView, { Marker } from "react-native-maps"
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
-import { createCar } from '../store/reducers/Car.reducer';
 import AppLoader from "../components/AppLoader"
 import ModalPicker  from "../components/ModalPicker"
 import Checkbox from 'expo-checkbox';
 import { getUser } from '../store/reducers/User.reducer';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from 'react-native-root-toast';
 
 const EditCar = ({navigation, route}) => {
     const {loading} = useSelector(
@@ -32,7 +32,7 @@ const EditCar = ({navigation, route}) => {
         const {car}= route.params
 
 
-    const Options = ["Audi", "BMW", "Chevrolet", "Citroen", "Daihatsu", "Dodge", "Fiat", "Ford", "Honda", "Hyundai", "Jeep", "Kia","Mazda", "Mercedes-Benz", "MINI", "Mitsubishi Motors", "Nissan", "Peugeot", "Porsche", "Renault", "Seat", "Skoda", "SSangYong", "Subaru", "Suzuki", "Tesla", "Toyota", "Volkswagen", "Volvo"]
+        const Options = ["Audi", "BMW", "Chevrolet", "Citroen","Dodge", "Fiat", "Ford", "Honda", "Hyundai", "Jeep", "Kia","Mazda", "Mercedes-Benz", "Mitsubishi Motors", "Nissan", "Peugeot", "Porsche", "Renault", "SSangYong","Suzuki", "Toyota", "Volkswagen", "Volvo"]
     const Colors = ["Beige", "Negro", "Azul", "Marrón", "Vinotinto", "Crema", "Dorado", "Verde", "Gris", "Anaranjado", "Morado", "Rojo","Plateado", "Blanco", "Amarillo"]
     const navigation1 =useNavigation();
     const dispatch = useDispatch()
@@ -194,7 +194,34 @@ const EditCar = ({navigation, route}) => {
                     console.log("respuesta",data1)
                     
             } catch (err) {
-                console.log(err.response)
+                let toast = Toast.show('Huboun error', {
+                    duration: Toast.durations.LONG,
+                    position: Toast.positions.BOTTOM,
+                    shadow: false,
+                    animation: true,
+                    hideOnPress: true,
+                    backgroundColor:"#C1C0C9",
+                    textColor:"#000",
+                    opacity:0.8,
+                    delay: 0,
+                    onShow: () => {
+                        // calls on toast\`s appear animation start
+                    },
+                    onShown: () => {
+                        // calls on toast\`s appear animation end.
+                    },
+                    onHide: () => {
+                        // calls on toast\`s hide animation start.
+                    },
+                    onHidden: () => {
+                        // calls on toast\`s hide animation end.
+                    }
+                });
+          
+                // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+                setTimeout(function () {
+                    Toast.hide(toast);
+                }, 2000);
             }
             };
         

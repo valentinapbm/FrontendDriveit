@@ -81,6 +81,11 @@ const LoginSesion = () => {
                         <Text style={style.textLeft}>
                     Login
                     </Text></TouchableOpacity>
+
+                    <TouchableOpacity activeOpacity={0.7} onPress={()=> {navigation.navigate("RecoveryPassword")}}>
+                        <Text style={style.textLeft2}>
+                    Olvidaste tu contraseña?
+                    </Text></TouchableOpacity>
                 </View>
             </ScrollView>
 
@@ -140,6 +145,13 @@ const style = StyleSheet.create({
         textLeft:
         {
             color: "white",
+            fontFamily:"Poppins_700Bold",
+            fontSize: SIZES.h4,
+        },
+        textLeft2:
+        {
+            paddingTop:10,
+            color: "#072F4A",
             fontFamily:"Poppins_700Bold",
             fontSize: SIZES.h4,
         },

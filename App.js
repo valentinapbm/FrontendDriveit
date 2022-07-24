@@ -18,7 +18,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign'
 import Icon3 from 'react-native-vector-icons/Entypo'
 import Icon4 from 'react-native-vector-icons/FontAwesome5'
-
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import LoginSesion from './screens/LoginSesion';
 import RegisterSesion from './screens/RegisterSesion';
@@ -41,10 +40,22 @@ import CarsHost from './screens/CarsHost';
 import BookingsCars from './screens/BookingCars';
 import PaymentScreen from './screens/PaymentScreen';
 import EditCar from './screens/EditCar';
-import ImageBrowserScreen2 from "./components/ImageBrowser2"
+import ImageBrowserScreen2 from "./components/ImageBrowser2";
+import InfoUser from "./screens/InfoUser"
+import ChangePassword from "./screens/ChangePassword"
+import RecoveryPassword from './screens/RecoveryPassword';
+import VerifyToken from "./screens/VerifyToken"
+import ResetPassword from './screens/ResetPassword';
+import UserBooking from './screens/UserBookings';
+import SuccessfullBooking from './screens/SuccessfullBooking';
+import DeleteCar from './screens/DeleteCar';
+
+
 const routeName = getFocusedRouteNameFromRoute("ProfileUser");
 const Tab = createBottomTabNavigator();
 const TabTop = createMaterialTopTabNavigator();
+
+
 let token;
 
 
@@ -221,7 +232,7 @@ function Navbar({route}) {
               }} />
         }
         {role !== "host" &&
-        <Tab.Screen name="Reservas" component={SearchScreen} options={{
+        <Tab.Screen name="ReservasUser" component={UserBooking} options={{
           tabBarIcon: ({color}) => (
             <Icon2 name="car" color={color} size={28} />
           ),
@@ -383,7 +394,14 @@ const RootNavigation = ({route}) => {
           <Stack.Screen name="DetailsScreen" component={DetailsScreen} options={{header: () => null}} />
           <Stack.Screen name="DeleteAccount" component={DeleteAccount} options={{header: () => null}} /> 
           <Stack.Screen name="EditCar" component={EditCar} options={{header: () => null}} /> 
-          <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{header: () => null}} />                          
+          <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{header: () => null}} />
+          <Stack.Screen name="InfoUser" component={InfoUser} options={{header: () => null}} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} options={{header: () => null}} />
+          <Stack.Screen name="RecoveryPassword" component={RecoveryPassword} options={{header: () => null}} /> 
+          <Stack.Screen name="VerifyToken" component={VerifyToken} options={{header: () => null}} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} options={{header: () => null}} /> 
+          <Stack.Screen name="SuccessfullBooking" component={SuccessfullBooking} options={{header: () => null}} /> 
+          <Stack.Screen name="DeleteCar" component={DeleteCar} options={{header: () => null}} />      
           
         </Stack.Navigator>
         

@@ -14,7 +14,7 @@ import {
     } from '@expo-google-fonts/poppins'
 import { useFonts } from "expo-font";
 
-const Input =({label, iconName, error, password,number, required, OnFocus=()=>{},...props})=>{
+const Input =({label, iconName, error, password,number, required, newpass, OnFocus=()=>{},...props})=>{
     
     const [hidePassword, setHidePassword] = React.useState(password);
     const [isFocused, setIsFocused] = React.useState(false);
@@ -32,6 +32,9 @@ const Input =({label, iconName, error, password,number, required, OnFocus=()=>{}
     return(
         <View style={{marginBottom:15}}>
             <Text style={style.label}>{label}{required && <Text style={{color:"red"}}> *</Text>}</Text>
+            {newpass && <Text style={{fontSize: 12, paddingTop:5, paddingBottom:5,
+        color: "black",
+        fontFamily:"Poppins_300Light"}}>La contraseña debe tener mínimo 8 caracteres, una minuscula, una mayuscula, un numero o un caracter especial</Text>}
             <View style={[
             style.inputContainer,
             {

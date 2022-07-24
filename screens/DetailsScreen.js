@@ -23,6 +23,9 @@ const DetailsScreen = ({ route, navigation }) => {
     const { carData, loadingCar } = useSelector(
         (state) => state.carReducer
     );
+    const { isLoggedIn, name, role, image, loading } = useSelector(
+        (state) => state.userReducer
+      );
 
     const [ region, setRegion ] = React.useState({
 		latitude: carData.lat,
@@ -35,6 +38,38 @@ const DetailsScreen = ({ route, navigation }) => {
         dispatch(getCarsbyId(itemId));
         
     }, []);
+    console.log(carData.bookings, "aki")
+
+    function addDays(numOfDays, date = new Date()) {
+        date.setDate(date.getDate() + numOfDays);
+      
+        return date;
+      }
+    function getDates(startDate, endDate) {
+        const dates = [];
+        let currentDate = startDate;
+        const addDays = function (days) {
+            const date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+            };
+            while (currentDate <= endDate) {
+            dates.push(currentDate);
+            currentDate = addDays.call(currentDate, 1);
+            }
+            return dates;
+        }
+
+       
+        let BookingDates = [];
+        if(carData.bookings !== undefined){
+        const datesf = carData.bookings.forEach((index) => {
+            BookingDates.push(getDates(new Date(index.startDate), addDays(1, new Date(index.endDate))))
+          });
+          console.log(BookingDates.toString().split(','))
+        }
+          
+  
     let [fontsLoaded] = useFonts({
         Poppins_400Regular,
         Poppins_700Bold,
@@ -43,6 +78,7 @@ const DetailsScreen = ({ route, navigation }) => {
     function currencyFormat(num) {
         return '$' + num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
     }
+
 
     if (!fontsLoaded) {
         return null
@@ -144,10 +180,16 @@ const DetailsScreen = ({ route, navigation }) => {
         <View
         style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:"white"}}>
         <FlatList ListFooterComponent={list} contentContainerStyle={{paddingTop:30,  paddingBottom:50}} initialNumToRender={5} nestedScrollEnabled={true} removeClippedSubviews={true}/>
-        <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={()=> {navigation.navigate("PaymentScreen", {car: null, cPhotos: null, carId:carData._id, carPrice:carData.price})}}>
+        {isLoggedIn === true && role !== "host"  &&
+        <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={()=> {navigation.navigate("PaymentScreen", {car: null, cPhotos: null, carId:carData._id, carPrice:carData.price, dates1: BookingDates.toString().split(',')})}}>
                         <Text style={style.textLeft}>
                     RESERVAR
-        </Text></TouchableOpacity>
+        </Text></TouchableOpacity>}
+        {isLoggedIn === false  &&
+        <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={()=> {navigation.navigate("LoginSesion")}}>
+                        <Text style={style.textLeft}>
+                    Iniciar sesión
+        </Text></TouchableOpacity>}
         </View>
     );
 };

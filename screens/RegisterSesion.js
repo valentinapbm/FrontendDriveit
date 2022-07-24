@@ -61,6 +61,9 @@ const RegisterSesion = () => {
         if (!inputs.password) {
         handleError('Por favor ingresa tu contraseña', 'password');
         isValid = false;
+        }else if (!inputs.password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)) {
+            handleError('La contraseña no cumple con los requisitos', 'password');
+            isValid = false;
         }
         if(isValid === true){
             const data ={ 
@@ -106,7 +109,7 @@ const RegisterSesion = () => {
                         onFocus={() => handleError(null, 'email')}  error={errors.email} required/>
                         {errorRegister === "email already exist" && <Text style={{color:"red",fontFamily:"Poppins_400Regular"}}>Correo ya existe</Text>}
                 <Input label="Contraseña" iconName="lock-outline" placeholder="Ingresa tu contraseña" password onChangeText={text => handleOnchange(text, 'password')}
-                    onFocus={() => handleError(null, 'password')}  error={errors.password} required />
+                    onFocus={() => handleError(null, 'password')}  error={errors.password} required  newpass/>
                     <View style={style.container}>
                     {PROP.map(res => {
 					return (
@@ -132,16 +135,16 @@ const RegisterSesion = () => {
 				})}
                     </View>
                     
-                    <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={validate}>
-                        <Text style={style.textLeft}>
-                    Registrate
-                    </Text></TouchableOpacity>
+                   
                 </View>
                 <View>
 
                 </View>
             </ScrollView>
-
+ <TouchableOpacity activeOpacity={0.7} style={style.left} onPress={validate}>
+                        <Text style={style.textLeft}>
+                    Registrate
+                    </Text></TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -176,12 +179,13 @@ const style = StyleSheet.create({
 
         },
         left:{
-            width:"100%",
+            width:"90%",
             alignItems: 'center',
             justifyContent: 'center',
             padding:15,
             borderRadius: 4,
             backgroundColor: '#072F4A',
+            margin:20
         },
         rigth:{
             width:"60%",

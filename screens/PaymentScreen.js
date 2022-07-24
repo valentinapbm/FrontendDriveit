@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import { getUser } from '../store/reducers/User.reducer';
+import { useDispatch } from 'react-redux';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button, DefaultTheme, Provider as PaperProvider,  TextInput, TouchableRipple } from 'react-native-paper';
@@ -29,7 +30,7 @@ import {
     pickDateFromCalendar: 'Pick date from calendar',
     close: 'Close',
     })
-
+import AppLoader from '../components/AppLoader';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { useTheme } from 'react-native-paper';
 import { TimePickerModal } from 'react-native-paper-dates'
@@ -47,6 +48,8 @@ const theme = {
         accent: '#ff1744',
     },
     };
+import Toast from 'react-native-root-toast';
+import * as RootNavigation from "../components/RootNavigation"
 
 const PaymentScreen = ({navigation, route}) => {
     const [range, setRange] = useState({ startDate: undefined, endDate: undefined });
@@ -61,10 +64,11 @@ const PaymentScreen = ({navigation, route}) => {
     const [modal, setModal] = useState(false)
     const [paymentMethod, setPaymentMethod]=useState("Selecciona una opción")
     const [index, setIndex]=useState(-1)
-    const {carId, carPrice}=route.params
+    const {carId, carPrice, dates1}=route.params
     const [errors, setErrors] = useState({});
     const [totalPrice, setTotalPrice]= useState(0);
-
+    const [loading, setLoading]= useState(false);
+    const  dispatch = useDispatch()
     function getDates(startDate, endDate) {
       const dates = [];
       let currentDate = startDate;
@@ -109,6 +113,7 @@ const PaymentScreen = ({navigation, route}) => {
           const datesTotal = getDates(startDate, endDate)
           const pric = Number(carPrice)*Number(datesTotal.length)
           setTotalPrice(Number(carPrice)*Number(datesTotal.length))
+          setErrors({...errors,initialDate:null})
         },
         [setOpen, setRange]
       );
@@ -146,51 +151,98 @@ const PaymentScreen = ({navigation, route}) => {
  const handleSheetChanges = useCallback((index) => {
     setIndex(0)
   }, []);
-      
+  const handleError = (error, input) => {
+    setErrors(prevState => ({...prevState, [input]: error}));
+};
   async function validate () {
     
-    const data ={
-      carId: carId,
-      startDate: dates.startDate,
-      endDate: dates.endDate,
-      pickupHour: Object.values(hours),
-      leftHour: Object.values(hoursOut),
-      priceTotal: totalPrice,
-      payment: "cash",
-      statusBooking:"Active"
-    }
-    console.log(data)
+    let isValid = true;
+        if (dateTextIn === "Fecha Inicial") {
+        handleError('Campo Obligatorio', 'initialDate');
+        isValid = false;
+        }
+        if (dateTextOut === "Fecha Final") {
+          handleError('Campo Obligatorio', 'finalDate');
+          isValid = false;
+          }
 
-    try{
-        const token = await AsyncStorage.getItem('token')
-        if(token !== null){
-        try {
-        const data1 = await axios.post(
-            `https://driveit-app.herokuapp.com/bookings/create/`, 
-            data,
-            {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                
-        },
-        });
+        if(isValid === true){
+              const data ={
+                carId: carId,
+                startDate: dates.startDate,
+                endDate: dates.endDate,
+                pickupHour: Object.values(hours),
+                leftHour: Object.values(hoursOut),
+                priceTotal: totalPrice,
+                payment: "cash",
+                statusBooking:"Active"
+              }
 
-            console.log("respuesta",data1)
-            
-    } catch (err) {
-        console.log(err.response)
-    }
-    };
+              try{
+                  const token = await AsyncStorage.getItem('token')
+                  if(token !== null){
+                    setLoading(true)
+                  try {
+                  const data1 = await axios.post(
+                      `https://driveit-app.herokuapp.com/bookings/create/`, 
+                      data,
+                      {
+                      headers: {
+                          Authorization: `Bearer ${token}`,
+                          
+                  },
+                  });
+                      
+                      setLoading(false)
+                      dispatch(getUser())
+                      RootNavigation.navigate("SuccessfullBooking")
+              } catch (err) {
+                setLoading(false)
+                let toast = Toast.show('Huboun error', {
+                  duration: Toast.durations.LONG,
+                  position: Toast.positions.BOTTOM,
+                  shadow: false,
+                  animation: true,
+                  hideOnPress: true,
+                  backgroundColor:"#C1C0C9",
+                  textColor:"#000",
+                  opacity:0.8,
+                  delay: 0,
+                  onShow: () => {
+                      // calls on toast\`s appear animation start
+                  },
+                  onShown: () => {
+                      // calls on toast\`s appear animation end.
+                  },
+                  onHide: () => {
+                      // calls on toast\`s hide animation start.
+                  },
+                  onHidden: () => {
+                      // calls on toast\`s hide animation end.
+                  }
+              });
 
-} catch(err){
-    console.log(err.response)
-};
+              // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+              setTimeout(function () {
+                  Toast.hide(toast);
+              }, 2000);
+              
+              }
+              };
+
+          } catch(err){
+              console.log(err.response)
+          };
+        }
 }
-
+console.log(dates1)
 function currencyFormat(num) {
   return '$' + num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
 }
-
+      const dates2 = dates1.map((item)=>{
+        return(
+          new Date(item))
+      })
 
       const list = (
         <>
@@ -224,8 +276,13 @@ function currencyFormat(num) {
                 <Text style={{fontSize: 14
             , fontFamily:"Poppins_300Light", color:"grey", paddingLeft:10}}><Icon name="calendar" size={15}/> {dateTextOut}</Text>
             </TouchableOpacity>
-            </View>
             
+            </View>
+            {errors.initialDate && (
+            <Text style={{marginBottom: 2, color: "red", fontSize: 12, fontFamily:"Poppins_300Light"}}>
+            {errors.initialDate}
+            </Text>
+            )}
             <View style={{flexDirection:"row", justifyContent:"space-between"}}>
                 <View style={{flexDirection:"column", width:"45%"}}>
                 <Text style={{fontSize: 14
@@ -255,6 +312,7 @@ function currencyFormat(num) {
                         , fontFamily:"Poppins_300Light", color:"grey", paddingLeft:10}}>{hoursOut.hours}:{hoursOut.minutes}</Text>
                     </TouchableOpacity>
             </View>
+            
             </View>
         </View>
         
@@ -283,7 +341,7 @@ function currencyFormat(num) {
             </View>
             {paymentMethod === "credit" && 
             <StripeProvider  publishableKey={"pk_test_51LORjaDDc38cnPECodUdlLugrM3eyGGbrzx2MbODPDUiItwRATvcpDfhhWD1xpU1GzncfPJZca8ReJHT9s4Iwd8S00pJRK7bqW"}>
-                <StripeApp price={carPrice}/>  
+                <StripeApp carId={carId} startDate={dates.startDate} endDate={dates.endDate} pickupHour={Object.values(hours)} leftHour={Object.values(hoursOut)} priceTotal={totalPrice}/>  
                 </StripeProvider>
                 }
             
@@ -342,11 +400,11 @@ function currencyFormat(num) {
         endDate={range.endDate}
         onConfirm={onConfirm}
       
-        // validRange={{
+        validRange={{
         //   startDate: new Date(2021, 1, 2),  // optional
         //   endDate: new Date(), // optional
-        //   disabledDates: [new Date()] // optional
-        // }}
+        disabledDates: dates2 // optional
+        }}
         // onChange={} // same props as onConfirm but triggered without confirmed by user
         // saveLabel="Save" // optional
         // uppercase={false} // optional, default is true
@@ -391,7 +449,7 @@ function currencyFormat(num) {
         
         <SafeAreaView
         style={{flex: 1, backgroundColor:"#f3f5fb"}}>
-            
+            {loading === true && <AppLoader/>}
         <FlatList keyboardShouldPersistTaps='handled' ListFooterComponent={list} contentContainerStyle={{paddingTop:60, paddingHorizontal:20, paddingBottom:100}}></FlatList>
         <BottomSheet
         ref={bottomSheetRef}
